@@ -33,7 +33,7 @@ router:
         metrics:
           common:
             service_name: "apollo-router-template"
-            service_namespace: "$NAMESPACE" # Replace with your namespace
+            service_namespace: "K8S_NAMESPACE" # Replace with your namespace
           prometheus:
             enabled: true
             listen: 0.0.0.0:9092
