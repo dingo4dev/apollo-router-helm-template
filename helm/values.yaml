@@ -66,7 +66,7 @@ extraVolumes:
 extraVolumeMounts:
   - name: graph-schema
     mountPath: /schema/
-    readOnly: false
+    readOnly: true
 
 podSecurityContext:
   runAsUser: 1000
