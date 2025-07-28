@@ -1,0 +1,81 @@
+nameOverride: "apollo-router-template"
+fullnameOverride: "apollo-router-template"
+
+autoscaling: 
+  enabled: false # Enable for autoscaling
+  maxReplicas: 2
+  minReplicas: 1
+  targetCPUUtilizationPercentage: 80
+
+containerPorts:
+  health: 8088
+  http: 80
+  metrics: 9092
+
+image:
+  pullPolicy: IfNotPresent
+  repository: ghcr.io/apollographql/router
+
+router:
+  configuration:
+    homepage: 
+      enabled: false # Enable if you want to use the homepage
+    sandbox:
+      enabled: true
+    supergraph:
+      listen: 0.0.0.0:80 # Listen on port 80 for HTTP traffic
+      path: /graphql # Path for GraphQL queries
+      introspection: true # Enable introspection for federated schemas  
+    health-check:
+      listen: 0.0.0.0:8088 # Health check endpoint
+    telemetry:
+      exporters:
+        metrics:
+          common:
+            service_name: "apollo-router-template"
+            service_namespace: "K8S_NAMESPACE" # Replace with your namespace
+          prometheus:
+            enabled: true
+            listen: 0.0.0.0:9092
+            path: "/metrics"
+    headers:
+      # Send all Header to all subgraph, can specific to any subgraph
+      all:
+        request:
+          - propagate:
+              matching: .*
+    
+    cors:
+      allow_any_origin: false # Set to true if you want to allow any origin
+      origins:
+        - https://studio.apollographql.com # Keep this so Apollo Studio can run queries against your router
+        - http://studio.apollographql.com
+        - https://custom-domain.com  # Replace with your custom domain
+        - http://custom-domain.com # Replace with your custom domain
+      match_origins:
+        - "^https?://.*[.]custom-domain[.]com(:[0-9]+)?$" # Match any subdomain of custom-domain.com
+  args:
+    - --hot-reload #apply change without requiring a restart of the router process
+    - --supergraph
+    - /schema/supergraph-schema.graphql # Path to the supergraph schema file
+
+extraVolumes:
+  - name: graph-schema
+    configMap:
+      name: apollo-router-template-supergraph
+extraVolumeMounts:
+  - name: graph-schema
+    mountPath: /schema/
+    readOnly: true
+
+podSecurityContext:
+  runAsUser: 1000
+  
+
+serviceentry:
+  enabled: true
+  hosts:
+    - custom-domain.com
+
+serviceMonitor:
+  enabled: true
