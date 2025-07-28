@@ -1,0 +1,10 @@
+federation_version: 2
+subgraphs:
+  subgraph_1:
+    routing_url: 'http://subgraph_1.$K8S_NAMESPACE/graphql'
+    schema:
+      subgraph_url: 'http://subgraph_1.$K8S_NAMESPACE/graphql'  
+  subgraph_2:
+    routing_url: 'http://subgraph_2.$K8S_NAMESPACE/graphql'
+    schema:
+      subgraph_url: 'http://subgraph_2.$K8S_NAMESPACE/graphql'  
